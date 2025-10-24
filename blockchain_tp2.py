@@ -1,3 +1,5 @@
+import hashlib
+import json
 
 class Block:
     def __init__(self, index, timestamp, data, previous_hash=""):
@@ -10,7 +12,12 @@ class Block:
         # Hash of the previous block (link)
         self.previous_hash = previous_hash
         # Hash of the current block (to be computed later)
-        self.hash = ""
+        self.hash = self.compute_hash()
+
+    def compute_hash(self):
+        # Concatenate the block data to form a string
+        block_string = f"{self.index}{self.timestamp}{self.data}{self.previous_hash}".encode()
+        return hashlib.sha256(block_string).hexdigest()
 
 
 if __name__ == "__main__":
@@ -32,11 +39,12 @@ if __name__ == "__main__":
     print("Previous Hash:", genesis_block.previous_hash)
     print("Hash:", genesis_block.hash)  # empty for now
 
+    
     bloc1 = Block(
         1,
         "2025-10-12 00:05",
         "Alice envoie 5 BTC",
-        previous_hash=genesis_block.hash,
+        previous_hash=blockchain[-1].hash,
     )
     blockchain.append(bloc1)
 
@@ -51,7 +59,7 @@ if __name__ == "__main__":
         2,
         "2025-10-12 00:10",
         "Bob envoie 3 BTC",
-        previous_hash=bloc1.hash,
+        previous_hash=blockchain[-1].hash,
     )
     blockchain.append(bloc2)
 
@@ -66,7 +74,7 @@ if __name__ == "__main__":
         3,
         "2025-10-12 00:15",
         "Charlie envoie 2 BTC",
-        previous_hash=bloc2.hash,
+        previous_hash=blockchain[-1].hash,
     )
     blockchain.append(bloc3)
 
@@ -76,10 +84,18 @@ if __name__ == "__main__":
     print("Données:", bloc3.data)
     print("Previous Hash:", bloc3.previous_hash)
     print("Hash:", bloc3.hash)
+
     # Display the full chain
+    print("--------------------------------")
+    print("Blockchain")
     for bloc in blockchain:
         print(
             f"Bloc {bloc.index} : data={bloc.data}, prev_hash={bloc.previous_hash}, hash={bloc.hash}"
         )
+
+    # Also display as JSON for verification
+    print("--------------------------------")
+    print("Blockchain as JSON")
+    print(json.dumps([b.__dict__ for b in blockchain], indent=4, ensure_ascii=False))
 
 
