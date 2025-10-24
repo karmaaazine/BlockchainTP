@@ -15,7 +15,7 @@ Tester le hachage et l'immuabilité des blocs en :
 3. Vérifiant le lien entre les blocs via JSON
 
 ### Contenu du dépôt
-- `blockchain_tp2.py` : script qui implémente la méthode `create_hash()`, teste l'immuabilité, et affiche la blockchain en JSON.
+- `blockchain_tp2.py` : script qui implémente la méthode `compute_hash()`, teste l'immuabilité, crée une blockchain de 4 blocs (genèse + 3 blocs), et affiche la blockchain en JSON.
 
 ### Prérequis
 - Python 3.8+
@@ -53,18 +53,19 @@ class Block:
 ```
 
 ### Calcul du hachage (recommandé)
-Pour que `previous_hash` pointe vers un vrai hachage, il faut calculer et stocker `hash` après la création de chaque bloc. Exemple :
+Pour que `previous_hash` pointe vers un vrai hachage, il faut calculer et stocker `hash` après la création de chaque bloc. Dans `blockchain_tp2.py`, le hash est automatiquement calculé dans le constructeur :
+
 ```python
 import hashlib
 
 def compute_hash(self):
-    content = f"{self.index}{self.timestamp}{self.data}{self.previous_hash}"
-    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+    block_string = f"{self.index}{self.timestamp}{self.data}{self.previous_hash}".encode()
+    return hashlib.sha256(block_string).hexdigest()
 
-# Après instanciation du bloc
-genesis_block.hash = genesis_block.compute_hash()
-bloc1 = Block(1, "2025-10-12 00:05", "Alice envoie 5 BTC", previous_hash=genesis_block.hash)
-bloc1.hash = bloc1.compute_hash()
+# Le hash est automatiquement calculé dans le constructeur
+def __init__(self, index, timestamp, data, previous_hash=""):
+    # ... autres attributs ...
+    self.hash = self.compute_hash()  # Calcul automatique
 ```
 
 ### Vérifier la liaison et la validité
@@ -103,8 +104,25 @@ def validate_chain(chain):
 **TP 2 :**
 - Chaque bloc a un hash unique calculé avec SHA-256
 - Les blocs sont liés via `previous_hash` (chaque bloc pointe vers le hash du précédent)
+- Création d'une blockchain de 4 blocs (genèse + 3 blocs de transaction)
+- Méthode `isDifferent()` pour comparer les blocs
 - L'affichage JSON montre la structure complète de la blockchain
 - Test d'immuabilité : modification des données change complètement le hash
+
+### Changements récents dans blockchain_tp2.py
+
+**Nouvelles fonctionnalités ajoutées :**
+- **Calcul automatique du hash** : Le hash est maintenant calculé automatiquement dans le constructeur de la classe `Block`
+- **Blockchain étendue** : Ajout d'un troisième bloc (bloc3) avec la transaction "Charlie envoie 2 BTC"
+- **Méthode de comparaison** : Nouvelle méthode `isDifferent()` pour vérifier si deux blocs sont différents
+- **Affichage amélioré** : Chaque bloc affiche maintenant sa méthode `isDifferent()` avec le bloc précédent
+- **Sortie JSON complète** : Affichage de la blockchain complète au format JSON pour vérification
+
+**Structure de la blockchain :**
+1. Bloc de genèse (index 0)
+2. Bloc 1 : "Alice envoie 5 BTC" (index 1)
+3. Bloc 2 : "Bob envoie 3 BTC" (index 2)
+4. Bloc 3 : "Charlie envoie 2 BTC" (index 3)
 
 ### Dépannage
 
