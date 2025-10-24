@@ -6,13 +6,31 @@ Mettre en place une structure de bloc minimale en Python, créer un bloc de gen�
 ### Contenu du dépôt
 - `blockchain_tp1.py` : script principal qui définit la classe `Block`, crée la blockchain, affiche les blocs et (optionnellement) vérifie la validité.
 
+## TP 2 – Test du Hachage et de l'Immuabilité
+
+### Objectif
+Tester le hachage et l'immuabilité des blocs en :
+1. Calculant un hachage et changeant les données pour voir la différence
+2. Liant les blocs par leur hash (previous_hash)
+3. Vérifiant le lien entre les blocs via JSON
+
+### Contenu du dépôt
+- `blockchain_tp2.py` : script qui implémente la méthode `create_hash()`, teste l'immuabilité, et affiche la blockchain en JSON.
+
 ### Prérequis
 - Python 3.8+
 
-### Lancer le script
-Dans le répertoire du projet :
+### Lancer les scripts
+Dans le répertoire du projet :
+
+**TP 1 :**
 ```bash
 python blockchain_tp1.py
+```
+
+**TP 2 :**
+```bash
+python blockchain_tp2.py
 ```
 
 ### Structure d’un bloc
@@ -76,13 +94,27 @@ def validate_chain(chain):
 ```
 
 ### Résultats attendus
+
+**TP 1 :**
 - Le bloc de genèse affiche un `hash` non vide et `previous_hash = "0"`.
 - Le second bloc affiche `previous_hash` égal au `hash` du bloc de genèse.
-- La validation de la chaîne (si ajoutée) doit indiquer qu’elle est valide.
+- La validation de la chaîne (si ajoutée) doit indiquer qu'elle est valide.
+
+**TP 2 :**
+- Chaque bloc a un hash unique calculé avec SHA-256
+- Les blocs sont liés via `previous_hash` (chaque bloc pointe vers le hash du précédent)
+- L'affichage JSON montre la structure complète de la blockchain
+- Test d'immuabilité : modification des données change complètement le hash
 
 ### Dépannage
-- **`previous_hash` vide sur le second bloc** : assurez-vous d’avoir d’abord calculé et assigné `genesis_block.hash` avant de créer le second bloc.
-- **Hashes identiques après modifications** : si vous changez les données, recalculer le `hash` du bloc concerné.
+
+**TP 1 :**
+- **`previous_hash` vide sur le second bloc** : assurez-vous d'avoir d'abord calculé et assigné `genesis_block.hash` avant de créer le second bloc.
+- **Hashes identiques après modifications** : si vous changez les données, recalculer le `hash` du bloc concerné.
+
+**TP 2 :**
+- **`TypeError: Strings must be encoded before hashing`** : assurez-vous d'utiliser `.encode("utf-8")` ou `.encode()` avant de passer la chaîne à `hashlib.sha256()`
+- **Hashes identiques** : vérifiez que chaque bloc a des données uniques (index, timestamp, data différents)
 
 
 
