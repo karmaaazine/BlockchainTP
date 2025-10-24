@@ -19,6 +19,8 @@ class Block:
         block_string = f"{self.index}{self.timestamp}{self.data}{self.previous_hash}".encode()
         return hashlib.sha256(block_string).hexdigest()
 
+    def isDifferent(self, other):
+        return self.previous_hash != other.hash
 
 if __name__ == "__main__":
     
@@ -54,6 +56,7 @@ if __name__ == "__main__":
     print("Données:", bloc1.data)
     print("Previous Hash:", bloc1.previous_hash)
     print("Hash:", bloc1.hash)
+    print("Is Different:", bloc1.isDifferent(genesis_block))
 
     bloc2 = Block(
         2,
@@ -69,6 +72,7 @@ if __name__ == "__main__":
     print("Données:", bloc2.data)
     print("Previous Hash:", bloc2.previous_hash)
     print("Hash:", bloc2.hash)
+    print("Is Different:", bloc2.isDifferent(bloc1))
 
     bloc3 = Block(
         3,
@@ -84,6 +88,7 @@ if __name__ == "__main__":
     print("Données:", bloc3.data)
     print("Previous Hash:", bloc3.previous_hash)
     print("Hash:", bloc3.hash)
+    print("Is Different:", bloc3.isDifferent(bloc2))
 
     # Display the full chain
     print("--------------------------------")
