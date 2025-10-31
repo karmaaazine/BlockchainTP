@@ -124,6 +124,41 @@ def validate_chain(chain):
 3. Bloc 2 : "Bob envoie 3 BTC" (index 2)
 4. Bloc 3 : "Charlie envoie 2 BTC" (index 3)
 
+## TP 3 – Preuve de Travail (PoW), Validation et Minage
+
+### Objectif
+- Introduire un `nonce` et un niveau de difficulté pour la Preuve de Travail (PoW).
+- Miner chaque bloc avant son ajout à la chaîne.
+- Valider l’intégrité de la blockchain (hash, chaînage, respect de la PoW).
+- Détecter la falsification en recalculant et en vérifiant les liens.
+
+### Contenu du dépôt
+- `blockchain_tp3.py` : implémente le minage (PoW), la validation stricte de la chaîne et une simulation de falsification.
+
+### Lancer le script
+```bash
+python blockchain_tp3.py
+```
+
+### Principes implémentés
+- **Nonce et minage** :
+  - `Block.nonce` initialisé à 0 et inclus dans `compute_hash()`.
+  - `mine_block(difficulty)`: incrémente le nonce jusqu’à ce que `hash` commence par `difficulty` zéros.
+- **Blockchain avec difficulté** :
+  - `Blockchain.difficulty = 4` (modifiable) et minage du bloc de genèse.
+  - `add_block(data)`: construit le bloc (index auto, timestamp système, `previous_hash`), mine puis ajoute.
+- **Validation** :
+  - `is_chain_valid()` vérifie pour chaque bloc: intégrité du hash recalculé, lien `previous_hash`, et PoW (hash commence par `0` répété `difficulty`). Le genèse est aussi vérifié.
+
+### Démonstration dans le script
+1. Ajoute 3 blocs minés (Alice, Bob, Charlie) et affiche nonce + hash.
+2. Valide la chaîne: attendu `True` si aucune falsification.
+3. Simule une falsification (modifie `data` du bloc 1), puis revalide: attendu `False` avec message explicite.
+
+### Résultats attendus (TP 3)
+- Les hash minés commencent par `0000` (pour `difficulty=4`).
+- La chaîne est valide avant falsification, invalide après modification d’un bloc sans re-minage en cascade.
+
 ### Dépannage
 
 **TP 1 :**
