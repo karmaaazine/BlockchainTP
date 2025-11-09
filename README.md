@@ -169,5 +169,35 @@ python blockchain_tp3.py
 - **`TypeError: Strings must be encoded before hashing`** : assurez-vous d'utiliser `.encode("utf-8")` ou `.encode()` avant de passer la chaîne à `hashlib.sha256()`
 - **Hashes identiques** : vérifiez que chaque bloc a des données uniques (index, timestamp, data différents)
 
+## TP 4 – Transactions, Récompense et Solde
+
+### Objectif
+- Introduire une classe `Transaction` pour modéliser les transferts entre adresses.
+- Regrouper plusieurs transactions dans un même bloc.
+- Gérer une file de transactions en attente et implémenter une récompense de minage.
+- Calculer le solde de chaque adresse et valider la chaîne résultante.
+
+### Contenu du dépôt
+- `blockchain_tp4.py` : implémente les transactions, le minage des transactions en attente, la récompense du mineur et le calcul des soldes.
+
+### Lancer le script
+```bash
+python blockchain_tp4.py
+```
+
+### Principes implémentés
+- **Transactions** : `Transaction(from_addr, to_addr, amount)` via `@dataclass`. Une transaction de récompense utilise `from_addr=None`.
+- **Blocs** : stockent une liste de transactions, un timestamp, un `nonce` et le `previous_hash`. Le hash est calculé à partir de tous ces éléments.
+- **Pending transactions** : ajoutées avec `Blockchain.create_transaction()`, puis regroupées lors de l'appel à `mine_pending_transactions(miner_address)`.
+- **Récompense** : après le minage d'un bloc, une transaction de récompense est ajoutée aux transactions en attente pour le mineur.
+- **Soldes** : `get_balance_of_address(address)` parcourt tous les blocs pour déterminer le solde courant.
+- **Validation** : `is_chain_valid()` vérifie l'intégrité de chaque bloc (hash et chaînage).
+
+### Démonstration dans le script
+1. Alice envoie 50 unités à Bob, Bob en envoie 25 à Charlie.
+2. Miner `Miner1` valide les transactions : un bloc est ajouté et une récompense est programmée.
+3. Un second minage inclut la récompense précédente, `Miner1` reçoit une nouvelle récompense.
+4. Les soldes d'Alice, Bob, Charlie et du mineur sont affichés, puis la validité de la chaîne est vérifiée.
+
 
 
