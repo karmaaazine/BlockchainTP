@@ -199,5 +199,132 @@ python blockchain_tp4.py
 3. Un second minage inclut la récompense précédente, `Miner1` reçoit une nouvelle récompense.
 4. Les soldes d'Alice, Bob, Charlie et du mineur sont affichés, puis la validité de la chaîne est vérifiée.
 
+## TP 5 – Cryptographie, Signatures et Arbre de Merkle
+
+### Objectif
+- Implémenter la cryptographie asymétrique (RSA) pour la génération de clés et le chiffrement.
+- Créer et vérifier des signatures numériques pour authentifier les transactions.
+- Construire un arbre de Merkle pour garantir l'intégrité d'un ensemble de transactions.
+- Intégrer les signatures et la racine Merkle dans les blocs de la blockchain.
+
+### Contenu du dépôt
+- `blockchain_tp5.py` : implémente la cryptographie RSA, les signatures numériques, l'arbre de Merkle et les blocs signés avec racine Merkle.
+
+### Lancer le script
+```bash
+python blockchain_tp5.py
+```
+
+### Principes implémentés
+
+#### Exercice 1 : Cryptographie asymétrique (RSA)
+- **Génération de clés** : La classe `Wallet` génère des paires de clés RSA (2048 ou 4096 bits).
+  - Comparaison des temps de génération entre différentes tailles de clés.
+  - Une clé plus longue est plus sûre mais plus lente à générer.
+- **Chiffrement et déchiffrement** :
+  - `encrypt_message()` : chiffre un message avec la clé publique (padding OAEP).
+  - `decrypt_message()` : déchiffre un message avec la clé privée.
+  - Seule la clé privée peut déchiffrer un message chiffré avec la clé publique correspondante.
+
+#### Exercice 2 : Signature numérique
+- **Création de signature** :
+  - `sign_message()` : signe un message avec la clé privée (padding PSS).
+  - `signer_message()` : fonction utilitaire pour signer un message.
+- **Vérification de signature** :
+  - `verify_signature()` : vérifie une signature avec la clé publique.
+  - `verifier_signature()` : fonction utilitaire pour vérifier une signature.
+- **Intégrité** : Toute modification du message invalide la signature, garantissant l'authenticité et l'intégrité.
+
+#### Exercice 3 : Arbre de Merkle
+- **Construction de l'arbre** :
+  - `make_leaf_hashes()` : crée les hash des feuilles (transactions).
+  - `merkle_root()` : calcule la racine de l'arbre de Merkle en combinant les hash par paires.
+  - Gestion des listes impaires (duplication du dernier élément).
+- **Preuve d'inclusion** :
+  - `merkle_proof()` : génère une preuve d'inclusion pour une transaction donnée.
+  - `verify_proof()` : vérifie qu'une transaction est incluse dans l'arbre en utilisant la preuve.
+- **Détection de modifications** : Toute modification d'une transaction change la racine Merkle, permettant de détecter les altérations.
+
+#### Exercice 4 : Bloc signé avec Merkle Root
+- **Structure du bloc** :
+  - `Block` inclut maintenant : `index`, `timestamp`, `transactions`, `prev_hash`, `merkle_root`, `hash`, et `signature`.
+  - La racine Merkle est calculée automatiquement à partir des transactions du bloc.
+  - Le hash du bloc est calculé à partir du header (index, timestamp, merkle_root, prev_hash).
+- **Signature du mineur** :
+  - Chaque bloc est signé par le mineur avec sa clé privée lors de la création.
+  - `verify_block()` : vérifie la signature et l'intégrité du bloc.
+- **Blockchain mise à jour** :
+  - `Blockchain.mine_pending_transactions()` accepte maintenant un `Wallet` de mineur.
+  - Les blocs sont automatiquement signés lors du minage.
+  - `is_chain_valid()` vérifie les signatures de tous les blocs.
+
+### Démonstration dans le script
+
+**Exercice 1 :**
+1. Génération de clés RSA 2048 bits et mesure du temps.
+2. Génération de clés RSA 4096 bits et comparaison (environ 13-27x plus long).
+3. Chiffrement et déchiffrement d'un message.
+
+**Exercice 2 :**
+1. Création d'une signature pour une transaction.
+2. Vérification de la signature (valide).
+3. Test avec message modifié (signature invalide).
+4. Test des fonctions utilitaires.
+
+**Exercice 3 :**
+1. Construction d'un arbre de Merkle à partir de transactions.
+2. Génération et vérification d'une preuve d'inclusion.
+3. Test avec transaction modifiée (racine Merkle différente).
+
+**Exercice 4 :**
+1. Création de blocs signés avec racine Merkle.
+2. Minage de transactions et ajout à la blockchain.
+3. Vérification des signatures de chaque bloc.
+4. Validation de la chaîne complète.
+5. Test de falsification (modification d'une transaction invalide le bloc).
+6. Affichage des soldes des participants.
+
+### Résultats attendus (TP 5)
+- Les clés RSA 4096 bits prennent significativement plus de temps à générer que les 2048 bits.
+- Les messages peuvent être chiffrés avec la clé publique et déchiffrés uniquement avec la clé privée.
+- Les signatures sont valides pour les messages originaux et invalides après modification.
+- L'arbre de Merkle produit une racine unique pour chaque ensemble de transactions.
+- Les preuves d'inclusion permettent de vérifier qu'une transaction est dans l'arbre sans avoir toutes les transactions.
+- Les blocs signés sont vérifiables et toute altération invalide la signature et la racine Merkle.
+- La chaîne est valide avant falsification, invalide après modification d'un bloc.
+
+### Fonctionnalités principales
+
+**Classe Wallet :**
+```python
+wallet = Wallet(key_size=2048)  # Génère une paire de clés RSA
+ciphertext = wallet.encrypt_message(message)  # Chiffre un message
+plaintext = wallet.decrypt_message(ciphertext)  # Déchiffre un message
+signature = wallet.sign_message(message)  # Signe un message
+is_valid = wallet.verify_signature(message, signature)  # Vérifie une signature
+```
+
+**Fonctions Merkle Tree :**
+```python
+leaf_hashes = make_leaf_hashes(transactions)  # Crée les hash des feuilles
+root = merkle_root(leaf_hashes)  # Calcule la racine Merkle
+proof = merkle_proof(leaf_hashes, index)  # Génère une preuve d'inclusion
+is_valid = verify_proof(leaf_hash, proof, root)  # Vérifie la preuve
+```
+
+**Bloc avec Merkle Root et Signature :**
+```python
+block = Block(index, transactions, prev_hash, miner_private_key)
+is_valid = block.verify_block(miner_public_key)  # Vérifie la signature
+```
+
+### Dépannage
+
+**TP 5 :**
+- **`ModuleNotFoundError: No module named 'cryptography'`** : Installez la bibliothèque avec `pip install cryptography`
+- **Erreur de signature** : Assurez-vous d'utiliser la même clé publique que celle correspondant à la clé privée qui a signé.
+- **Racine Merkle différente** : Vérifiez que les transactions sont dans le même ordre et format lors du calcul de la racine.
+- **Signature invalide après modification** : C'est normal ! Toute modification d'un bloc invalide sa signature, ce qui garantit l'intégrité.
+
 
 
